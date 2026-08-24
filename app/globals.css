@@ -1,26 +1,404 @@
 @import "tailwindcss";
+/* Fonts are loaded via next/font/google in app/layout.tsx (self-hosted, optimized) */
+
+/* ─── Mentis Design Tokens ──────────────────────────────────────────────── */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand colours */
+  --mentis-deep:    #0d2318;  /* darkest background — hero, nav dark */
+  --mentis-forest:  #1a3d32;  /* dark section backgrounds */
+  --mentis-teal:    #2d7d6e;  /* primary accent, buttons */
+  --mentis-teal-lt: #3d9d8c;  /* hover state */
+  --mentis-sage:    #6fa898;  /* secondary accent, leaf tones */
+  --mentis-sage-lt: #a8c9c2;  /* light sage, subtle accents */
+
+  /* Neutral / light surfaces */
+  --mentis-ivory:   #f5f0e8;  /* primary light background */
+  --mentis-stone:   #ece7de;  /* subtle card backgrounds */
+  --mentis-sand:    #c5b99a;  /* borders, dividers */
+  --mentis-warm:    #b0a28a;  /* muted warm accents */
+
+  /* Text */
+  --mentis-text:    #192820;  /* primary body text (dark) */
+  --mentis-muted:   #4f6b60;  /* secondary / muted text */
+  --mentis-light:   #f0ece4;  /* text on dark backgrounds */
+  --mentis-faint:   #c2cec9;  /* very muted text on dark */
+
+  /* Fonts */
+  --font-display:   "Cormorant Garamond", Georgia, serif;
+  --font-body:      "DM Sans", system-ui, sans-serif;
+
+  /* Spacing */
+  --section-py:    clamp(5rem, 10vw, 9rem);
+  --container-px:  clamp(1.25rem, 5vw, 5rem);
+  --container-max: 1280px;
+
+  /* Motion */
+  --ease-out-expo:  cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out:    cubic-bezier(0.45, 0, 0.55, 1);
+  --transition-md:  0.4s var(--ease-out-expo);
+  --transition-lg:  0.7s var(--ease-out-expo);
 }
+
+/* ─── Theme Tailwind v4 extension ───────────────────────────────────────── */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background:   var(--mentis-ivory);
+  --color-foreground:   var(--mentis-text);
+  --font-display:       var(--font-display);
+  --font-body:          var(--font-body);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Global Reset & Base ───────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: auto; /* Lenis handles smooth scroll */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+  background-color: var(--mentis-ivory);
+  color: var(--mentis-text);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  line-height: 1.7;
+}
+
+/* ─── Lenis ─────────────────────────────────────────────────────────────── */
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ─── Typography ─────────────────────────────────────────────────────────── */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+p {
+  font-family: var(--font-body);
+  line-height: 1.75;
+}
+
+/* ─── Selection ─────────────────────────────────────────────────────────── */
+
+::selection {
+  background-color: var(--mentis-sage);
+  color: var(--mentis-light);
+}
+
+/* ─── Focus ──────────────────────────────────────────────────────────────── */
+
+:focus-visible {
+  outline: 2px solid var(--mentis-teal);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--mentis-stone);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--mentis-sage);
+  border-radius: 3px;
+}
+
+/* ─── Container Utility ─────────────────────────────────────────────────── */
+
+.mentis-container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-px);
+}
+
+/* ─── Section Spacing ───────────────────────────────────────────────────── */
+
+.mentis-section {
+  padding-block: var(--section-py);
+}
+
+/* ─── Subtle organic noise/grain — dark sections ────────────────────────── */
+
+.mentis-grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* CTA buttons — visible, elegant motion for the conversion section */
+@keyframes cta-button-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(168, 201, 194, 0.38), 0 10px 30px rgba(5, 20, 14, 0.22);
+  }
+  50% {
+    transform: scale(1.045);
+    box-shadow: 0 0 0 12px rgba(168, 201, 194, 0), 0 14px 38px rgba(5, 20, 14, 0.32);
+  }
+}
+
+@keyframes cta-button-arrow {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(5px); }
+}
+
+@keyframes cta-button-sheen {
+  0% { transform: translateX(-180%) skewX(-20deg); }
+  55%, 100% { transform: translateX(260%) skewX(-20deg); }
+}
+
+@keyframes cta-card-float {
+  0%, 100% { transform: translateY(0) rotate(-0.5deg); }
+  50% { transform: translateY(-10px) rotate(0.5deg); }
+}
+
+@keyframes cta-card-ping {
+  0% { opacity: 0.7; transform: scale(0.88); }
+  70%, 100% { opacity: 0; transform: scale(1.35); }
+}
+
+.cta-button-primary {
+  animation: cta-button-pulse 2.4s var(--ease-in-out) infinite;
+}
+
+.cta-button-large {
+  min-width: 13.5rem;
+  padding: 1.15rem 2rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+}
+
+.nav-book-button {
+  min-width: 9.75rem;
+  padding: 0.7rem 1.25rem;
+  box-shadow: 0 7px 24px rgba(5, 20, 14, 0.28);
+}
+
+.nav-book-button:hover {
+  color: var(--mentis-forest);
+}
+
+.cta-button-arrow {
+  display: inline-block;
+  animation: cta-button-arrow 1.25s var(--ease-in-out) infinite;
+}
+
+.cta-button-secondary {
+  box-shadow: inset 0 0 0 1px rgba(168, 201, 194, 0.16), 0 8px 24px rgba(5, 20, 14, 0.16);
+}
+
+.cta-button-sheen {
+  position: absolute;
+  inset: -40% auto -40% -25%;
+  width: 34%;
+  z-index: 0;
+  background: linear-gradient(90deg, transparent, rgba(240, 236, 228, 0.32), transparent);
+  animation: cta-button-sheen 3s ease-in-out infinite;
+}
+
+.cta-orbit-card {
+  z-index: 20;
+}
+
+.cta-card-float {
+  animation: cta-card-float 4.2s var(--ease-in-out) infinite;
+}
+
+.cta-orbit-card:nth-child(2) .cta-card-float,
+.cta-orbit-card:nth-child(4) .cta-card-float {
+  animation-delay: -2.1s;
+}
+
+.cta-card-ping {
+  animation: cta-card-ping 2.2s ease-out infinite;
+}
+
+.cta-orbit-card:nth-child(2) .cta-card-ping { animation-delay: -0.7s; }
+.cta-orbit-card:nth-child(3) .cta-card-ping { animation-delay: -1.2s; }
+.cta-orbit-card:nth-child(4) .cta-card-ping { animation-delay: -1.7s; }
+
+/* Services — staggered reveal hooks and interactive card motion */
+@keyframes service-leaf-breathe {
+  0%, 100% { transform: translateY(0) rotate(-3deg) scale(1); filter: drop-shadow(0 0 0 rgba(45, 125, 110, 0)); }
+  50% { transform: translateY(-5px) rotate(4deg) scale(1.12); filter: drop-shadow(0 7px 8px rgba(45, 125, 110, 0.24)); }
+}
+
+.service-card {
+  text-decoration: none;
+  transform-origin: center bottom;
+  box-shadow: 0 0 0 rgba(13, 35, 24, 0);
+}
+
+.service-card:hover,
+.service-card:focus-visible,
+.service-card:focus-within {
+  z-index: 5;
+  transform: translateY(-6px) scale(1.008);
+  box-shadow: 0 16px 38px rgba(13, 35, 24, 0.12);
+}
+
+.service-spotlight {
+  opacity: 0;
+  transform: scale(0.55);
+  transition: opacity 0.55s ease, transform 0.65s var(--ease-out-expo);
+}
+
+.service-card:hover .service-spotlight,
+.service-card:focus-visible .service-spotlight,
+.service-card:focus-within .service-spotlight {
+  opacity: 1;
+  transform: scale(1.3);
+}
+
+.service-leaf {
+  width: fit-content;
+  animation: service-leaf-breathe 3.4s var(--ease-in-out) infinite;
+}
+
+.service-card:nth-child(even) .service-leaf {
+  animation-delay: -1.7s;
+}
+
+.service-number {
+  transition: color 0.35s ease, transform 0.45s var(--ease-out-expo);
+}
+
+.service-card:hover .service-number,
+.service-card:focus-visible .service-number {
+  color: var(--mentis-teal);
+  transform: translateX(8px);
+}
+
+.service-arrow {
+  transform: translateX(-14px);
+}
+
+.service-card:hover .service-arrow,
+.service-card:focus-visible .service-arrow,
+.service-card:focus-within .service-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.service-divider {
+  transition: height 0.35s ease, background-color 0.35s ease;
+}
+
+.service-card:hover .service-divider,
+.service-card:focus-visible .service-divider {
+  height: 4px;
+  background-color: var(--mentis-teal);
+}
+
+/* Promise section — restrained editorial motion */
+@keyframes promise-orbit {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(18px, -14px, 0) scale(1.06); }
+}
+
+@keyframes promise-leaf-float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-8px) rotate(3deg); }
+}
+
+.promise-orb {
+  position: absolute;
+  border-radius: 999px;
+  border: 1px solid rgba(111, 168, 152, 0.2);
+  background: radial-gradient(circle, rgba(111, 168, 152, 0.08), transparent 68%);
+  pointer-events: none;
+  animation: promise-orbit 9s var(--ease-in-out) infinite;
+}
+
+.promise-orb-one {
+  width: 22rem;
+  height: 22rem;
+  left: -9rem;
+  top: 12%;
+}
+
+.promise-orb-two {
+  width: 28rem;
+  height: 28rem;
+  right: -12rem;
+  bottom: 4%;
+  animation-delay: -4.5s;
+}
+
+.promise-line {
+  will-change: transform, opacity, filter, clip-path;
+}
+
+.promise-leaf {
+  width: fit-content;
+  margin-inline: auto;
+  animation: promise-leaf-float 3.8s var(--ease-in-out) infinite;
+}
+
+.cta-button-primary:hover,
+.cta-button-primary:hover .cta-button-arrow,
+.cta-button-secondary:hover .cta-button-arrow,
+.cta-button-secondary:hover .cta-button-sheen {
+  animation-play-state: paused;
+}
+
+/* ─── Overflow guard ─────────────────────────────────────────────────────── */
+
+#__next,
+main {
+  overflow-x: hidden;
+}
+
+/* ─── Reduced motion: disable heavy transitions ─────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }
